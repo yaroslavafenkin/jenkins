@@ -24,6 +24,8 @@
 
 package jenkins.slaves;
 
+import com.google.common.escape.Escaper;
+import com.google.common.escape.Escapers;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
@@ -168,13 +170,14 @@ public class RemotingWorkDirSettings implements Describable<RemotingWorkDirSetti
      * Gets a command line string, which can be passed to agent start command.
      *
      * @param computer Computer, for which the arguments need to be constructed.
+     * @param escaper  Escaper to prevent characters that may allow command injection. OS dependent.
      * @return Command line arguments.
      *         It may be empty if the working directory is disabled or
      *         if the Computer type is not {@link SlaveComputer}.
      */
     @NonNull
     @Restricted(NoExternalUse.class)
-    public String toCommandLineString(@NonNull SlaveComputer computer) {
+    public String toCommandLineString(@NonNull SlaveComputer computer, Escaper escaper) {
         if (disabled) {
             return "";
         }
@@ -187,7 +190,7 @@ public class RemotingWorkDirSettings implements Describable<RemotingWorkDirSetti
                 // It is not possible to launch this node anyway.
                 return "";
             }
-            bldr.append(node.getRemoteFS());
+            bldr.append(escaper.escape(node.getRemoteFS()));
         } else {
             bldr.append(workDirPath);
         }

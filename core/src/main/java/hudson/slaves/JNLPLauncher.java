@@ -232,8 +232,7 @@ public class JNLPLauncher extends ComputerLauncher {
         if (!input.isEmpty() && input.chars().allMatch(Character::isLetterOrDigit)) {
             return input;
         }
-        Escaper escaper =
-                Escapers.builder().addEscape('"', "\\\"").addEscape('`', "\\`").build();
+        Escaper escaper = getUnixEscaper();
         return "\"" + escaper.escape(input) + "\"";
     }
 
@@ -245,8 +244,16 @@ public class JNLPLauncher extends ComputerLauncher {
         if (!input.isEmpty() && input.chars().allMatch(Character::isLetterOrDigit)) {
             return input;
         }
-        Escaper escaper = Escapers.builder().addEscape('"', "\\\"").build();
+        Escaper escaper = getWindowsEscaper();
         return "\"" + escaper.escape(input) + "\"";
+    }
+
+    private static Escaper getUnixEscaper() {
+        return Escapers.builder().addEscape('"', "\\\"").addEscape('`', "\\`").build();
+    }
+
+    private static Escaper getWindowsEscaper() {
+        return Escapers.builder().addEscape('"', "\\\"").build();
     }
 
     /**
@@ -258,11 +265,14 @@ public class JNLPLauncher extends ComputerLauncher {
      */
     @NonNull
     @Restricted(NoExternalUse.class)
-    public String getWorkDirOptions(@NonNull Computer computer) {
-        if (!(computer instanceof SlaveComputer)) {
-            return "";
-        }
-        return workDirSettings.toCommandLineString((SlaveComputer) computer);
+    public String getWorkDirOptionsUnix(@NonNull Computer computer) {
+        return workDirSettings.toCommandLineString((SlaveComputer) computer, getUnixEscaper());
+    }
+
+    @NonNull
+    @Restricted(NoExternalUse.class)
+    public String getWorkDirOptionsWindows(@NonNull Computer computer) {
+        return workDirSettings.toCommandLineString((SlaveComputer) computer, getWindowsEscaper());
     }
 
     @Extension @Symbol({"inbound", "jnlp"})
