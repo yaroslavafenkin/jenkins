@@ -25,7 +25,6 @@
 package jenkins.slaves;
 
 import com.google.common.escape.Escaper;
-import com.google.common.escape.Escapers;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;

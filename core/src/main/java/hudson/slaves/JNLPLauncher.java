@@ -194,13 +194,13 @@ public class JNLPLauncher extends ComputerLauncher {
     @NonNull
     @Restricted(NoExternalUse.class)
     public String getRemotingOptionsUnix(@NonNull Computer computer) {
-        return getRemotingOptions(escapeUnix(computer.getName()));
+        return getRemotingOptions(escape(computer.getName(), getUnixEscaper()));
     }
 
     @NonNull
     @Restricted(NoExternalUse.class)
     public String getRemotingOptionsWindows(@NonNull Computer computer) {
-        return getRemotingOptions(escapeWindows(computer.getName()));
+        return getRemotingOptions(escape(computer.getName(), getWindowsEscaper()));
     }
 
     @Restricted(DoNotUse.class)
@@ -228,23 +228,11 @@ public class JNLPLauncher extends ComputerLauncher {
      * {@link Jenkins#checkGoodName(String)} saves us from most troublesome characters, but we still have to deal with
      * spaces and therefore with double quotes and backticks.
      */
-    private static String escapeUnix(@NonNull String input) {
+    private static String escape(@NonNull String input, Escaper escaper) {
         if (!input.isEmpty() && input.chars().allMatch(Character::isLetterOrDigit)) {
             return input;
         }
-        Escaper escaper = getUnixEscaper();
-        return "\"" + escaper.escape(input) + "\"";
-    }
 
-    /**
-     * {@link Jenkins#checkGoodName(String)} saves us from most troublesome characters, but we still have to deal with
-     * spaces and therefore with double quotes.
-     */
-    private static String escapeWindows(@NonNull String input) {
-        if (!input.isEmpty() && input.chars().allMatch(Character::isLetterOrDigit)) {
-            return input;
-        }
-        Escaper escaper = getWindowsEscaper();
         return "\"" + escaper.escape(input) + "\"";
     }
 
